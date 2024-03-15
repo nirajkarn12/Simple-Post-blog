@@ -7,31 +7,83 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function __construct(Post $post){
+    public function __construct(Post $post)
+    {
         $this->model = $post;
     }
 
-    public function view(){
-        return view ('posts.list',[
+    public function view()
+    {
+        return view('posts.list', [
             'posts' => Post::all(),
         ]);
     }
 
-    public function create(){
-        return view ('posts.create');
+    public function create()
+    {
+        return view('posts.create');
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $request->validate([
-            'title' =>'required',
-            'description' =>'required',
+            'title' => 'required',
+            'description' => 'required',
         ]);
 
         $this->model->create([
             'title' => $request->title,
             'description' => $request->description,
         ]);
-        return redirect()->route('post.view');
+
+        return redirect()->route('post.view')->with('success', 'Post added successfully');
     }
 
+    public function edit($postid)
+    {
+        $post = Post::find($postid);
+        if (!$post) {
+            return redirect()->route('post.view')->with('error', 'Post not found');
+        }
+        return view('posts.edit', [
+            'post' => $post,
+        ]);
+    }
+
+    public function update(Request $request, $postid)
+    {
+        $post = Post::find($postid);
+        if (!$post) {
+            return redirect()->route('post.view')->with('error', 'Post not found');
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+        ]);
+
+        $post->update([
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+        ]);
+
+        return redirect()->route('post.view')->with('success', 'Post edited successfully');
+    }
+
+    public function destroy($postid)
+    {
+        // Finding  the post by ID number
+        $post = Post::find($postid);
+
+        // Check garne exist or not
+        if (!$post) {
+            return redirect()->route('post.view')->with('error', 'Post not found');
+        }
+
+        // database bata udaunee
+        $post->delete();
+
+        // success message show garne
+        return redirect()->route('post.view')->with('success', 'Post deleted successfully');
+    }
 }
