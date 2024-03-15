@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class post extends Model
 {
     use HasFactory;
-    use softDeletes;
+    use SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = ['title','description'];
+    // protected $guarded = [];
 }
